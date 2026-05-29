@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react';
+export type { ComponentType };
 
 export type OutputFormat = 'xlsx' | 'csv';
 export type TrimOption = 'all' | 'left' | 'right' | 'none';
@@ -13,10 +14,17 @@ export interface FileData {
   rowCount: number;
 }
 
+export interface CompareMapping {
+  sourceCol: string;
+  lookupCol: string;
+  isKey: boolean;
+}
+
 export interface CompareOptions {
-  primaryKeys: string[];
+  mappings: CompareMapping[];
   caseSensitive: boolean;
   trim: TrimOption;
+  addChangeReason: boolean;
 }
 
 export interface CompareResult {

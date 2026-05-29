@@ -1,4 +1,4 @@
-employee_id,name,department,salary,change_reason,employee_id_lookup,name_lookup,department_lookup,salary_lookup
-E001,John Smith,Engineering,75000,changed,E001,John Smith,Engineering,70000
-E003,Bob Johnson,Engineering,68000,new,,,,
-E004,Alice Williams,HR,91000,changed,E004,Alice Williams,Finance,91000
+employee_id,name,department,salary,change_reason
+E001,John Smith,Engineering,75000,salary changed
+E003,Bob Johnson,Engineering,68000,new
+E004,Alice Williams,HR,91000,department changed

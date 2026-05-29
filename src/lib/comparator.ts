@@ -9,7 +9,7 @@ function applyTrim(v: CellValue, opt: CompareOptions['trim']): string {
   return s;
 }
 
-function makeKey(row: CellValue[], indices: number[], opts: CompareOptions): string {
+function makeKey(row: CellValue[], indices: number[], opts: Pick<CompareOptions, 'trim' | 'caseSensitive'>): string {
   return indices
     .map(i => {
       let v = applyTrim(row[i], opts.trim);
@@ -20,41 +20,48 @@ function makeKey(row: CellValue[], indices: number[], opts: CompareOptions): str
 }
 
 export function compare(source: FileData, lookup: FileData, opts: CompareOptions): CompareResult {
-  const srcKeyIdx = opts.primaryKeys.map(k => source.headers.indexOf(k)).filter(i => i >= 0);
-  const lkpKeyIdx = opts.primaryKeys.map(k => lookup.headers.indexOf(k)).filter(i => i >= 0);
+  const keyMappings  = opts.mappings.filter(m => m.isKey);
+  const srcKeyIdx    = keyMappings.map(m => source.headers.indexOf(m.sourceCol));
+  const lkpKeyIdx    = keyMappings.map(m => lookup.headers.indexOf(m.lookupCol));
+
+  const comparePairs = opts.mappings
+    .map(m => ({ si: source.headers.indexOf(m.sourceCol), li: lookup.headers.indexOf(m.lookupCol), label: m.sourceCol }))
+    .filter(p => p.si >= 0 && p.li >= 0);
 
   const lookupMap = new Map<string, CellValue[]>();
   for (const row of lookup.rows) {
     lookupMap.set(makeKey(row, lkpKeyIdx, opts), row);
   }
 
-  const extraHeaders = lookup.headers.map(h => `${h}_lookup`);
-  const outHeaders: CellValue[] = [...source.headers, 'change_reason', ...extraHeaders];
+  const outHeaders: CellValue[] = opts.addChangeReason
+    ? [...source.headers, 'change_reason']
+    : [...source.headers];
   const outRows: CellValue[][] = [outHeaders];
 
   let newCount = 0;
   let changedCount = 0;
 
   for (const row of source.rows) {
-    const key = makeKey(row, srcKeyIdx, opts);
+    const key   = makeKey(row, srcKeyIdx, opts);
     const match = lookupMap.get(key);
 
     if (!match) {
-      outRows.push([...row, 'new', ...new Array(lookup.headers.length).fill(null)]);
+      outRows.push(opts.addChangeReason ? [...row, 'new'] : [...row]);
       newCount++;
       continue;
     }
 
-    const changed = source.headers.some((h, si) => {
-      const li = lookup.headers.indexOf(h);
-      if (li < 0) return false;
-      const sv = opts.caseSensitive ? applyTrim(row[si], opts.trim) : normalise(row[si]);
-      const lv = opts.caseSensitive ? applyTrim(match[li], opts.trim) : normalise(match[li]);
-      return sv !== lv;
-    });
+    const changedLabels = comparePairs
+      .filter(p => {
+        const sv = opts.caseSensitive ? applyTrim(row[p.si], opts.trim) : normalise(row[p.si]);
+        const lv = opts.caseSensitive ? applyTrim(match[p.li], opts.trim) : normalise(match[p.li]);
+        return sv !== lv;
+      })
+      .map(p => p.label);
 
-    if (changed) {
-      outRows.push([...row, 'changed', ...match]);
+    if (changedLabels.length > 0) {
+      const reason = `${changedLabels.join(', ')} changed`;
+      outRows.push(opts.addChangeReason ? [...row, reason] : [...row]);
       changedCount++;
     }
   }

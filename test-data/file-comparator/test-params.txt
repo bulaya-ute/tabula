@@ -2,24 +2,39 @@ Tool: File Comparator
 Source file:  source.csv  (current state — 5 employees)
 Lookup file:  lookup.csv  (previous state — 5 employees, different set)
 
-Settings:
-  Primary key column(s): employee_id
-  Case sensitive:        No
-  Trim:                  All
+Column mappings (auto-populated since headers match by name):
+  Source column  | Lookup column  | Primary key
+  ---------------|----------------|------------
+  employee_id    | employee_id    | yes (tick)
+  name           | name           | no
+  department     | department     | no
+  salary         | salary         | no
+
+Options:
+  Add change_reason column: yes (checked)
+  Case-sensitive:           no
+  Whitespace trim:          Both sides
 
 What the data represents:
   source.csv = current employee records
   lookup.csv = previous employee records
 
 Expected changes detected:
-  E001  changed  — salary raised from 70000 to 75000
-  E002  no change — excluded from output
-  E003  new      — not present in lookup (new hire)
-  E004  changed  — department changed from Finance to HR
-  E005  no change — excluded from output
-  E006  only in lookup (departed employee) — not shown, comparator only walks source rows
+  E001  salary changed    — salary raised from 70000 to 75000
+  E002  no change         — excluded from output
+  E003  new               — not present in lookup (new hire)
+  E004  department changed — department changed from Finance to HR
+  E005  no change         — excluded from output
+  E006  only in lookup (departed employee) — not shown; comparator walks source rows only
 
 Expected output: expected-output.csv
   - 3 rows (only new/changed rows appear)
-  - Output columns: source columns + change_reason + lookup columns suffixed with _lookup
-  - "new" rows have empty lookup columns
+  - Output columns match source file exactly, plus change_reason appended
+  - change_reason lists the specific changed column name(s), e.g. "salary changed"
+  - "new" rows have change_reason = "new"
+
+Testing with different column names:
+  To test the cross-file mapping feature, rename a column in one file
+  (e.g. rename "employee_id" to "emp_id" in lookup.csv) and manually
+  set the lookup column dropdown to "emp_id" for the employee_id mapping row.
+  The comparison result should be identical.
