@@ -8,6 +8,7 @@ import { CsvXlsxConverter } from './CsvXlsxConverter';
 import { FileComparator }  from './FileComparator';
 import { Deduplicator }    from './Deduplicator';
 import { EmptyRowRemover } from './EmptyRowRemover';
+import { FileSplitter }   from './FileSplitter';
 
 /* ── Icons ─────────────────────────────────────────────────────────────── */
 
@@ -169,11 +170,11 @@ export const TOOLS: Tool[] = [
   {
     id: 'file-splitter',
     name: 'File Splitter',
-    description: 'Split a large file into smaller files by row count or by unique values in a column.',
+    description: 'Split a large file into smaller files by row count or by target number of files. Download individually or all as ZIP.',
     category: 'File Operations',
-    keywords: ['split', 'chunk', 'divide', 'partition', 'rows'],
+    keywords: ['split', 'chunk', 'divide', 'partition', 'rows', 'zip'],
     icon: Icon.Split,
-    stub: true,
+    component: FileSplitter,
   },
 
   // Analysis
