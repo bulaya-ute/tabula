@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import * as XLSX from 'xlsx';
+import { DataPreview } from '../components/DataPreview';
 import { DropZone } from '../components/DropZone';
 import { FormatSelector } from '../components/FormatSelector';
 import { StepCard } from '../components/StepCard';
@@ -206,6 +207,13 @@ export function ColumnRemapper() {
 
       {/* Step 3 — Mapping table */}
       <StepCard step={3} title="Configure mappings" visible={mappings.length > 0}>
+        {/* Column headers + clear all */}
+        <div className="grid grid-cols-[1fr_1.5fr_1fr_auto] gap-2 px-3 mb-1 items-center">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Output column</span>
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Source</span>
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Transform</span>
+          <button onClick={() => setMappings([])} className="text-xs text-slate-400 hover:text-red-500 whitespace-nowrap">Clear all</button>
+        </div>
         <div className="space-y-2">
           {mappings.map((m, i) => (
             <div key={i} className="grid grid-cols-[1fr_1.5fr_1fr_auto] gap-2 items-center bg-slate-50 dark:bg-slate-800 rounded-xl px-3 py-2.5">
@@ -280,34 +288,10 @@ export function ColumnRemapper() {
           ))}
         </div>
 
-        {/* Preview */}
-        {preview.length > 0 && (
-          <div className="mt-5 overflow-x-auto">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Preview (first 5 rows)</p>
-            <table className="w-full text-xs border-collapse">
-              <thead>
-                <tr>
-                  {mappings.map(m => (
-                    <th key={m.outputHeader} className="text-left text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 px-2 py-1.5 bg-slate-50 dark:bg-slate-800 font-mono">
-                      {m.outputHeader}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {preview.map((row, ri) => (
-                  <tr key={ri}>
-                    {row.map((cell, ci) => (
-                      <td key={ci} className="border border-slate-200 dark:border-slate-700 px-2 py-1.5 text-slate-700 dark:text-slate-300 max-w-[12rem] truncate">
-                        {cell === null ? <span className="text-slate-300 dark:text-slate-600 italic">null</span> : String(cell)}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <DataPreview
+          headers={mappings.map(m => m.outputHeader)}
+          rows={preview}
+        />
       </StepCard>
 
       {/* Step 4 */}

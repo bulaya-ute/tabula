@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { DataPreview } from '../components/DataPreview';
 import { DropZone } from '../components/DropZone';
 import { FormatSelector } from '../components/FormatSelector';
 import { StepCard } from '../components/StepCard';
@@ -135,8 +136,17 @@ export function Trimmer() {
         )}
       </StepCard>
 
-      <StepCard step={3} title="Download" visible={!!file}>
-        <div className="flex items-center gap-4 flex-wrap">
+      <StepCard step={3} title="Preview & Download" visible={!!file}>
+        {transforms.length > 0 && (
+          <DataPreview
+            headers={file?.headers ?? []}
+            rows={(file?.rows.slice(0, 5) ?? []).map(row =>
+              row.map((cell, ci) => isColSelected(file!.headers[ci]) ? applyAll(cell, transforms) : cell)
+            )}
+            label="Preview after transforms (first 5 rows)"
+          />
+        )}
+        <div className="flex items-center gap-4 flex-wrap mt-4">
           <FormatSelector value={format} onChange={setFormat} />
           <button onClick={handleDownload} className="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors">
             Download

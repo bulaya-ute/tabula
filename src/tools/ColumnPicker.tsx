@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { DataPreview } from '../components/DataPreview';
 import { DropZone } from '../components/DropZone';
 import { FormatSelector } from '../components/FormatSelector';
 import { StepCard } from '../components/StepCard';
@@ -97,8 +98,14 @@ export function ColumnPicker() {
         </div>
       </StepCard>
 
-      <StepCard step={3} title="Download" visible={cols.length > 0}>
-        <div className="flex items-center gap-4 flex-wrap">
+      <StepCard step={3} title="Preview & Download" visible={cols.length > 0}>
+        <DataPreview
+          headers={cols.filter(c => c.enabled).map(c => c.label)}
+          rows={(file?.rows.slice(0, 5) ?? []).map(row =>
+            cols.filter(c => c.enabled).map(c => row[file!.headers.indexOf(c.original)] ?? null)
+          )}
+        />
+        <div className="flex items-center gap-4 flex-wrap mt-4">
           <FormatSelector value={format} onChange={setFormat} />
           <button onClick={handleDownload} className="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors">
             Download

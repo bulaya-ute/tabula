@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { DataPreview } from '../components/DataPreview';
 import { MultiDropZone } from '../components/MultiDropZone';
 import { FormatSelector } from '../components/FormatSelector';
 import { StepCard } from '../components/StepCard';
@@ -80,8 +81,15 @@ export function FileMerger() {
         </label>
       </StepCard>
 
-      <StepCard step={3} title="Download" visible={files.length >= 2}>
-        <div className="flex items-center gap-4 flex-wrap">
+      <StepCard step={3} title="Preview & Download" visible={files.length >= 2}>
+        {(() => {
+          const ph = addSource ? ['_source', ...files[0].headers] : [...files[0].headers];
+          const pr: CellValue[][] = files.flatMap(f =>
+            f.rows.slice(0, 3).map(row => (addSource ? [f.file.name, ...row] : [...row]) as CellValue[])
+          ).slice(0, 5);
+          return <DataPreview headers={ph} rows={pr} label="Preview of merged output (sample rows)" />;
+        })()}
+        <div className="flex items-center gap-4 flex-wrap mt-4">
           <FormatSelector value={format} onChange={setFormat} />
           <button
             onClick={handleMerge}

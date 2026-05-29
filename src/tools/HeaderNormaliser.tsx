@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { DataPreview } from '../components/DataPreview';
 import { DropZone } from '../components/DropZone';
 import { FormatSelector } from '../components/FormatSelector';
 import { StepCard } from '../components/StepCard';
@@ -95,25 +96,32 @@ export function HeaderNormaliser() {
         </label>
 
         {preview.length > 0 && (
-          <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3 overflow-x-auto">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Preview</p>
-            <table className="text-xs">
-              <thead>
-                <tr>
-                  <th className="text-left text-slate-500 pr-6 pb-1 font-medium">Original</th>
-                  <th className="text-left text-slate-500 pb-1 font-medium">Normalised</th>
-                </tr>
-              </thead>
-              <tbody>
-                {file?.headers.map((h, i) => (
-                  <tr key={i}>
-                    <td className="font-mono text-slate-500 pr-6 py-0.5">{h}</td>
-                    <td className="font-mono text-slate-800 dark:text-white py-0.5">{preview[i]}</td>
+          <>
+            <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3 overflow-x-auto mb-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Header changes</p>
+              <table className="text-xs">
+                <thead>
+                  <tr>
+                    <th className="text-left text-slate-500 pr-6 pb-1 font-medium">Original</th>
+                    <th className="text-left text-slate-500 pb-1 font-medium">Normalised</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {file?.headers.map((h, i) => (
+                    <tr key={i}>
+                      <td className="font-mono text-slate-500 pr-6 py-0.5">{h}</td>
+                      <td className="font-mono text-slate-800 dark:text-white py-0.5">{preview[i]}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <DataPreview
+              headers={preview}
+              rows={file?.rows.slice(0, 5) ?? []}
+              label="Data preview with normalised headers (first 5 rows)"
+            />
+          </>
         )}
       </StepCard>
 

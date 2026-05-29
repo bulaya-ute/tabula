@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { DataPreview } from '../components/DataPreview';
 import { DropZone } from '../components/DropZone';
 import { FormatSelector } from '../components/FormatSelector';
 import { StepCard } from '../components/StepCard';
@@ -10,17 +11,19 @@ type RemoveMode = 'rows' | 'cols' | 'both';
 
 function isEmpty(v: CellValue) { return v === null || String(v).trim() === ''; }
 
+interface Result { headers: string[]; rows: CellValue[][]; removedRows: number; removedCols: number; }
+
 export function EmptyRowRemover() {
   const { addToast } = useToast();
   const [file, setFile]     = useState<FileData | null>(null);
   const [mode, setMode]     = useState<RemoveMode>('rows');
   const [format, setFormat] = useState<OutputFormat>('xlsx');
-  const [stats, setStats]   = useState<{ rows: number; cols: number } | null>(null);
+  const [result, setResult] = useState<Result | null>(null);
 
   async function handleFile(f: File) {
     try {
       const data = await readFile(f);
-      setFile(data); setStats(null);
+      setFile(data); setResult(null);
       addToast(`Loaded ${data.rowCount} rows`, 'success');
     } catch { addToast('Failed to read file', 'error'); }
   }
@@ -46,11 +49,15 @@ export function EmptyRowRemover() {
       rows = rows.map(row => keepIndices.map(i => row[i] ?? null));
     }
 
-    const ext = format === 'xlsx' ? '.xlsx' : '.csv';
-    const outHeaders: CellValue[] = [...headers];
-    download([outHeaders, ...rows], `${stemName(file.file)}_cleaned${ext}`, format);
-    setStats({ rows: removedRows, cols: removedCols });
+    setResult({ headers, rows, removedRows, removedCols });
     addToast(`Removed ${removedRows} empty rows, ${removedCols} empty columns`, 'success');
+  }
+
+  function handleDownload() {
+    if (!result || !file) return;
+    const ext = format === 'xlsx' ? '.xlsx' : '.csv';
+    download([result.headers as CellValue[], ...result.rows], `${stemName(file.file)}_cleaned${ext}`, format);
+    addToast(`Downloaded ${result.rows.length} rows`, 'success');
   }
 
   return (
@@ -67,7 +74,7 @@ export function EmptyRowRemover() {
               <p className="text-sm font-medium text-slate-800 dark:text-white">{file.file.name}</p>
               <p className="text-xs text-slate-500 mt-0.5">{file.rowCount} rows · {file.headers.length} cols</p>
             </div>
-            <button onClick={() => { setFile(null); setStats(null); }} className="text-xs text-red-500">Remove</button>
+            <button onClick={() => { setFile(null); setResult(null); }} className="text-xs text-red-500">Remove</button>
           </div>
         ) : <DropZone onFile={handleFile} />}
       </StepCard>
@@ -76,7 +83,7 @@ export function EmptyRowRemover() {
         <div className="space-y-3 mb-4">
           {(['rows', 'cols', 'both'] as RemoveMode[]).map(m => (
             <label key={m} className="flex items-center gap-2 cursor-pointer">
-              <input type="radio" value={m} checked={mode === m} onChange={() => setMode(m)} className="w-3.5 h-3.5 accent-amber-600" />
+              <input type="radio" value={m} checked={mode === m} onChange={() => { setMode(m); setResult(null); }} className="w-3.5 h-3.5 accent-amber-600" />
               <span className="text-sm text-slate-700 dark:text-slate-300">
                 {m === 'rows' ? 'Remove empty rows only'
                   : m === 'cols' ? 'Remove empty columns only'
@@ -85,21 +92,30 @@ export function EmptyRowRemover() {
             </label>
           ))}
         </div>
-        <div className="flex items-center gap-4 flex-wrap">
-          <FormatSelector value={format} onChange={setFormat} />
-          <button onClick={handleRun} className="px-5 py-2 bg-amber-500 text-white text-sm font-semibold rounded-lg hover:bg-amber-600 transition-colors">
-            Clean & Download
-          </button>
-        </div>
-        {stats && (
-          <div className="flex gap-4 mt-4 flex-wrap">
-            <div className="bg-amber-50 dark:bg-amber-950/40 rounded-xl px-5 py-3 text-center">
-              <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{stats.rows}</p>
-              <p className="text-xs text-amber-700 dark:text-amber-500 font-medium mt-0.5">Empty rows removed</p>
+        <button onClick={handleRun} className="px-5 py-2 bg-amber-500 text-white text-sm font-semibold rounded-lg hover:bg-amber-600 transition-colors">
+          Run
+        </button>
+      </StepCard>
+
+      <StepCard step={3} title="Results" visible={!!result}>
+        {result && (
+          <div className="space-y-4">
+            <div className="flex gap-4 flex-wrap">
+              <div className="bg-amber-50 dark:bg-amber-950/40 rounded-xl px-5 py-3 text-center">
+                <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{result.removedRows}</p>
+                <p className="text-xs text-amber-700 dark:text-amber-500 font-medium mt-0.5">Empty rows removed</p>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-800 rounded-xl px-5 py-3 text-center">
+                <p className="text-2xl font-bold text-slate-700 dark:text-slate-300">{result.removedCols}</p>
+                <p className="text-xs text-slate-500 font-medium mt-0.5">Empty columns removed</p>
+              </div>
             </div>
-            <div className="bg-slate-50 dark:bg-slate-800 rounded-xl px-5 py-3 text-center">
-              <p className="text-2xl font-bold text-slate-700 dark:text-slate-300">{stats.cols}</p>
-              <p className="text-xs text-slate-500 font-medium mt-0.5">Empty columns removed</p>
+            <DataPreview headers={result.headers} rows={result.rows} />
+            <div className="flex items-center gap-4 flex-wrap">
+              <FormatSelector value={format} onChange={setFormat} />
+              <button onClick={handleDownload} className="px-5 py-2 bg-amber-500 text-white text-sm font-semibold rounded-lg hover:bg-amber-600 transition-colors">
+                Download
+              </button>
             </div>
           </div>
         )}

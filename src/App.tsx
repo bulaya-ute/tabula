@@ -10,8 +10,10 @@ function ActiveTool({ component: C }: { component: ComponentType }) {
   return <C />;
 }
 
+const getHashView = () => window.location.hash.replace(/^#/, '') || 'home';
+
 export default function App() {
-  const [view, setView] = useState<string>('home');
+  const [view, setView] = useState<string>(getHashView);
   const [stubModal, setStubModal] = useState<string | null>(null);
   const [theme, setTheme] = useState<Theme>(() =>
     (localStorage.getItem('tb-theme') as Theme) ?? 'light'
@@ -22,13 +24,19 @@ export default function App() {
     localStorage.setItem('tb-theme', theme);
   }, [theme]);
 
+  useEffect(() => {
+    const handler = () => setView(getHashView());
+    window.addEventListener('hashchange', handler);
+    return () => window.removeEventListener('hashchange', handler);
+  }, []);
+
   const activeTool  = TOOLS.find(t => t.id === view && !t.stub) ?? null;
-  const navigateHome = () => setView('home');
+  const navigateHome = () => { window.location.hash = ''; };
   const selectTool   = (id: string) => {
     const tool = TOOLS.find(t => t.id === id);
     if (!tool) return;
     if (tool.stub) { setStubModal(tool.name); return; }
-    setView(id);
+    window.location.hash = id;
   };
   const toggleTheme  = () => setTheme(t => (t === 'light' ? 'dark' : 'light'));
 

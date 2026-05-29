@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { DataPreview } from '../components/DataPreview';
 import { DropZone } from '../components/DropZone';
 import { FormatSelector } from '../components/FormatSelector';
 import { StepCard } from '../components/StepCard';
@@ -36,6 +37,14 @@ export function FileComparator() {
       setMappings(newSource && newLookup ? buildInitialMappings(newSource, newLookup) : []);
       addToast(`Loaded ${data.rowCount} rows`, 'success');
     } catch { addToast('Failed to read file', 'error'); }
+  }
+
+  function handleSwap() {
+    if (!source || !lookup) return;
+    setSource(lookup);
+    setLookup(source);
+    setMappings(prev => prev.map(m => ({ ...m, sourceCol: m.lookupCol, lookupCol: m.sourceCol })));
+    setResult(null);
   }
 
   function addMapping() {
@@ -79,7 +88,7 @@ export function FileComparator() {
 
       {/* Step 1 — Upload */}
       <StepCard step={1} title="Upload files">
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="relative grid sm:grid-cols-2 gap-4">
           <div>
             <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Source file</p>
             {source
@@ -91,6 +100,17 @@ export function FileComparator() {
               : <DropZone onFile={f => handleFile('source', f)} label="Drop source file" />
             }
           </div>
+          {source && lookup && (
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 hidden sm:block">
+              <button
+                onClick={handleSwap}
+                title="Swap files"
+                className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-full w-8 h-8 flex items-center justify-center shadow-sm hover:shadow-md hover:border-violet-400 dark:hover:border-violet-500 transition-all text-slate-600 dark:text-slate-300 text-base font-bold"
+              >
+                ⇄
+              </button>
+            </div>
+          )}
           <div>
             <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Lookup file</p>
             {lookup
@@ -195,15 +215,22 @@ export function FileComparator() {
               </div>
             </div>
             {result.total > 0 && (
-              <div className="flex items-center gap-4 flex-wrap">
-                <FormatSelector value={format} onChange={setFormat} />
-                <button
-                  onClick={handleDownload}
-                  className="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Download differences
-                </button>
-              </div>
+              <>
+                <DataPreview
+                  headers={(result.aoa[0] ?? []).map(h => String(h ?? ''))}
+                  rows={result.aoa.slice(1)}
+                  label="Preview of differences (first 5 rows)"
+                />
+                <div className="flex items-center gap-4 flex-wrap mt-4">
+                  <FormatSelector value={format} onChange={setFormat} />
+                  <button
+                    onClick={handleDownload}
+                    className="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Download differences
+                  </button>
+                </div>
+              </>
             )}
           </div>
         )}
