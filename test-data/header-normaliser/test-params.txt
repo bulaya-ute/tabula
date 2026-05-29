@@ -1,0 +1,24 @@
+Tool: Header Normaliser
+Input: input.csv
+
+Style: snake_case
+Trim whitespace: yes (checkbox enabled)
+
+Transformation applied to each header:
+  "Customer ID"    → customer_id
+  "First Name"     → first_name
+  "Last Name"      → last_name
+  "Email Address"  → email_address
+  "Phone Number"   → phone_number
+  "Date Of Birth"  → date_of_birth
+  "Account Status" → account_status
+
+Expected output: expected-output.csv
+  - Only headers are changed; all cell values are untouched
+
+Other styles to try (same input file):
+  camelCase    → customerId, firstName, lastName, ...
+  UPPER_SNAKE  → CUSTOMER_ID, FIRST_NAME, LAST_NAME, ...
+  Title Case   → Customer Id, First Name, Last Name, ...
+  lowercase    → customer id, first name, last name, ...
+  UPPERCASE    → CUSTOMER ID, FIRST NAME, LAST NAME, ...

@@ -1,0 +1,18 @@
+Tool: Column Remapper
+Input: input.csv
+
+Output schema (5 columns):
+  Output header    | Source type | Source value  | Transform
+  -----------------|-------------|---------------|----------
+  id               | column      | employee_id   | none
+  department       | column      | department    | uppercase
+  annual_salary    | column      | salary        | none
+  bonus            | fixed       | 5000          | none
+  notes            | blank       | —             | none
+
+Expected output: expected-output.csv
+  - employee_id is renamed to id
+  - department values are uppercased (including "marketing" → "MARKETING")
+  - salary is renamed to annual_salary with no change to values
+  - bonus column is filled with the fixed value "5000" for every row
+  - notes column is blank for every row

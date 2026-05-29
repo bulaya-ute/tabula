@@ -1,0 +1,6 @@
+order_id,customer_name,customer_email,product_code,product_name,quantity,unit_price,discount,total_price,order_date,shipping_address,status
+ORD001,Alice Brown,alice@example.com,PRD-A1,Wireless Mouse,2,29.99,0.00,59.98,2024-01-15,123 Main St,Shipped
+ORD002,Bob Green,bob@example.com,PRD-B2,USB Keyboard,1,49.99,5.00,44.99,2024-01-16,456 Oak Ave,Processing
+ORD003,Carol White,carol@example.com,PRD-A1,Wireless Mouse,3,29.99,0.00,89.97,2024-01-17,789 Pine Rd,Shipped
+ORD004,David Black,david@example.com,PRD-C3,Monitor Stand,1,35.00,0.00,35.00,2024-01-18,321 Elm St,Pending
+ORD005,Eve Gray,eve@example.com,PRD-B2,USB Keyboard,2,49.99,10.00,89.98,2024-01-19,654 Maple Dr,Processing

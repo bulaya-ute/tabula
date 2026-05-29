@@ -1,0 +1,25 @@
+Tool: File Comparator
+Source file:  source.csv  (current state — 5 employees)
+Lookup file:  lookup.csv  (previous state — 5 employees, different set)
+
+Settings:
+  Primary key column(s): employee_id
+  Case sensitive:        No
+  Trim:                  All
+
+What the data represents:
+  source.csv = current employee records
+  lookup.csv = previous employee records
+
+Expected changes detected:
+  E001  changed  — salary raised from 70000 to 75000
+  E002  no change — excluded from output
+  E003  new      — not present in lookup (new hire)
+  E004  changed  — department changed from Finance to HR
+  E005  no change — excluded from output
+  E006  only in lookup (departed employee) — not shown, comparator only walks source rows
+
+Expected output: expected-output.csv
+  - 3 rows (only new/changed rows appear)
+  - Output columns: source columns + change_reason + lookup columns suffixed with _lookup
+  - "new" rows have empty lookup columns

@@ -1,0 +1,6 @@
+product_id,product_name,price,in_stock
+P001,Laptop,999.99,true
+P002,Wireless Mouse,29.99,true
+P003,USB Keyboard,49.99,false
+P004,Monitor,349.99,true
+P005,USB Hub,25.00,false

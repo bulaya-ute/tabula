@@ -1,0 +1,6 @@
+Order ID,Customer,Product,Qty,Total ($),Status
+ORD001,Alice Brown,Wireless Mouse,2,59.98,Shipped
+ORD002,Bob Green,USB Keyboard,1,44.99,Processing
+ORD003,Carol White,Wireless Mouse,3,89.97,Shipped
+ORD004,David Black,Monitor Stand,1,35.00,Pending
+ORD005,Eve Gray,USB Keyboard,2,89.98,Processing

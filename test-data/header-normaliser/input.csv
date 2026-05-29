@@ -1,0 +1,6 @@
+Customer ID,First Name,Last Name,Email Address,Phone Number,Date Of Birth,Account Status
+C001,John,Smith,john@example.com,555-0101,1985-03-22,Active
+C002,Jane,Doe,jane@example.com,555-0102,1990-07-14,Active
+C003,Bob,Johnson,bob@example.com,555-0103,1978-11-30,Inactive
+C004,Alice,Williams,alice@example.com,555-0104,1995-02-08,Active
+C005,Charlie,Brown,charlie@example.com,555-0105,1988-09-19,Suspended

@@ -1,0 +1,5 @@
+sale_id,salesperson,region,product,amount,sale_date
+S009,David,West,Keyboard,79.99,2024-03-01
+S010,Bob,South,Laptop,1200.00,2024-03-07
+S011,Carol,East,USB Hub,45.00,2024-03-15
+S012,Alice,North,Mouse,29.99,2024-03-28

@@ -1,0 +1,9 @@
+order_id,customer_id,product,amount,_duplicate
+ORD001,C001,Laptop,999.99,yes
+ORD002,C002,Mouse,29.99,yes
+ORD003,C001,Keyboard,79.99,no
+ORD004,C003,Laptop,999.99,yes
+ORD005,C002,Mouse,29.99,yes
+ORD006,C001,Laptop,999.99,yes
+ORD007,C004,Monitor,349.99,no
+ORD008,C003,Laptop,999.99,yes

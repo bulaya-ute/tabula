@@ -1,0 +1,21 @@
+Tool: Column Picker
+Input: input.csv (12 columns)
+
+Columns to keep and rename (all others should be disabled/unchecked):
+  Original name      | New label
+  -------------------|----------
+  order_id           | Order ID
+  customer_name      | Customer
+  product_name       | Product
+  quantity           | Qty
+  total_price        | Total ($)
+  status             | Status
+
+Columns to drop: customer_email, product_code, unit_price, discount, order_date, shipping_address
+
+Column order: keep the same relative order as the original file (no reordering needed).
+
+Expected output: expected-output.csv
+  - 6 columns, 5 data rows
+  - Headers are renamed as specified above
+  - Only data from the 6 selected source columns is included

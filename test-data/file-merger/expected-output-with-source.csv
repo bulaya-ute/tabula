@@ -1,0 +1,13 @@
+_source,sale_id,salesperson,region,product,amount,sale_date
+input-jan.csv,S001,Alice,North,Laptop,1200.00,2024-01-05
+input-jan.csv,S002,Bob,South,Mouse,29.99,2024-01-08
+input-jan.csv,S003,Alice,North,Keyboard,79.99,2024-01-12
+input-jan.csv,S004,Carol,East,Monitor,349.99,2024-01-20
+input-feb.csv,S005,Bob,South,Laptop,1200.00,2024-02-03
+input-feb.csv,S006,David,West,USB Hub,45.00,2024-02-09
+input-feb.csv,S007,Carol,East,Mouse,29.99,2024-02-14
+input-feb.csv,S008,Alice,North,Monitor,349.99,2024-02-22
+input-mar.csv,S009,David,West,Keyboard,79.99,2024-03-01
+input-mar.csv,S010,Bob,South,Laptop,1200.00,2024-03-07
+input-mar.csv,S011,Carol,East,USB Hub,45.00,2024-03-15
+input-mar.csv,S012,Alice,North,Mouse,29.99,2024-03-28

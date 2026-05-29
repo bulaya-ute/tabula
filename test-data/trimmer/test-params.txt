@@ -1,0 +1,19 @@
+Tool: Trimmer / Normaliser
+Input: input.csv
+
+Operations (applied in this order): Trim whitespace, lowercase
+Apply to columns: product_name and category only (uncheck "All columns", then select just these two)
+
+What changes per column:
+  product_name: leading/trailing spaces stripped, then lowercased
+  category:     leading/trailing spaces stripped, then lowercased
+  product_id:   unchanged (not selected)
+  price:        unchanged (not selected)
+
+Notable transformations:
+  "  Wireless Mouse  " → "wireless mouse"
+  "  Electronics  "    → "electronics"
+  "ELECTRONICS"        → "electronics"
+  "  furniture  "      → "furniture"
+
+Expected output: expected-output.csv

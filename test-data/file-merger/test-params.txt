@@ -1,0 +1,15 @@
+Tool: File Merger
+Input: input-jan.csv, input-feb.csv, input-mar.csv (upload all three)
+
+All three files share identical column headers:
+  sale_id, salesperson, region, product, amount, sale_date
+
+Test A — without source column:
+  "Add _source column" checkbox: unchecked
+  Expected output: expected-output.csv
+  Result: 12 rows, 6 columns (rows from all three files concatenated in upload order)
+
+Test B — with source column:
+  "Add _source column" checkbox: checked
+  Expected output: expected-output-with-source.csv
+  Result: 12 rows, 7 columns (_source column added as first column with original filename)

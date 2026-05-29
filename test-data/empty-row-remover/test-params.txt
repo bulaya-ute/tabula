@@ -1,0 +1,21 @@
+Tool: Empty Row / Column Remover
+Input: input.csv (6 data rows, 5 columns)
+
+Structure of the input:
+  - Rows 3 and 5 (,,,,) are entirely blank
+  - "notes" column is blank in every data row
+  - "comments" column is blank in every data row
+
+Test A — Remove both (recommended test):
+  Mode: "Remove both empty rows and columns"
+  Expected output: expected-output.csv
+  Result: 4 rows, 3 columns (notes and comments columns removed; 2 empty rows removed)
+
+Test B — Remove empty rows only:
+  Mode: "Remove empty rows only"
+  Expected: 4 data rows, all 5 columns kept (notes and comments columns remain, still blank)
+
+Test C — Remove empty columns only:
+  Mode: "Remove empty columns only"
+  Expected: 6 data rows (including the 2 blank rows), 3 columns (notes and comments removed)
+  Note: the blank rows survive because only columns are filtered in this mode

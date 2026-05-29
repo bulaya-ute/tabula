@@ -1,0 +1,13 @@
+sale_id,salesperson,region,product,amount,sale_date
+S001,Alice,North,Laptop,1200.00,2024-01-05
+S002,Bob,South,Mouse,29.99,2024-01-08
+S003,Alice,North,Keyboard,79.99,2024-01-12
+S004,Carol,East,Monitor,349.99,2024-01-20
+S005,Bob,South,Laptop,1200.00,2024-02-03
+S006,David,West,USB Hub,45.00,2024-02-09
+S007,Carol,East,Mouse,29.99,2024-02-14
+S008,Alice,North,Monitor,349.99,2024-02-22
+S009,David,West,Keyboard,79.99,2024-03-01
+S010,Bob,South,Laptop,1200.00,2024-03-07
+S011,Carol,East,USB Hub,45.00,2024-03-15
+S012,Alice,North,Mouse,29.99,2024-03-28

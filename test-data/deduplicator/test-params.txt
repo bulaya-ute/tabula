@@ -1,0 +1,23 @@
+Tool: Deduplicator
+Input: input.csv (8 rows)
+
+Key columns: customer_id AND product (check both)
+  A duplicate = two rows sharing the same customer_id + product combination.
+
+Duplicate groups in the input:
+  C001 + Laptop    → ORD001, ORD006  (2 rows)
+  C002 + Mouse     → ORD002, ORD005  (2 rows)
+  C003 + Laptop    → ORD004, ORD008  (2 rows)
+  C001 + Keyboard  → ORD003          (unique)
+  C004 + Monitor   → ORD007          (unique)
+
+Test A — Keep first:
+  Mode: "Keep first"
+  Expected output: expected-output-keep-first.csv
+  Result: 5 rows (3 duplicates removed — ORD005, ORD006, ORD008)
+
+Test B — Flag all:
+  Mode: "Flag all (add column)"
+  Expected output: expected-output-flagged.csv
+  Result: 8 rows with a new _duplicate column ("yes"/"no")
+  Note: ORD003 and ORD007 are "no"; all others are "yes" (they belong to a group of 2+)

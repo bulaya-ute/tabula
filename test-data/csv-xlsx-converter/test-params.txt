@@ -1,0 +1,12 @@
+Tool: CSV / XLSX Converter
+Input: input.csv
+
+Test A — CSV to XLSX:
+  Upload input.csv, download as XLSX.
+  Expected: downloaded file opens in Excel/Sheets with identical data (5 rows, 4 columns).
+
+Test B — XLSX to CSV:
+  Take the XLSX downloaded from Test A, upload it back, download as CSV.
+  Expected: output matches input.csv (same data, possibly minor numeric formatting differences).
+
+No transformation is applied — only the file format changes.
