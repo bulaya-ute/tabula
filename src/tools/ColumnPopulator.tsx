@@ -7,13 +7,86 @@ import { useRules } from '../context/RulesContext';
 import { useToast } from '../context/ToastContext';
 import { applyAssignments, getPromotedArgs } from '../lib/rulesEngine';
 import { download, readFile, stemName } from '../lib/utils';
-import type { ColumnAssignment } from '../types/rules';
+import { STEP_LABELS, type ColumnAssignment, type RuleStep, type SimpleStepType, type UserRule } from '../types/rules';
 import type { CellValue, FileData, OutputFormat } from '../types';
 
 interface LookupFile { data: FileData; alias: string; }
 
 const INPUT = 'text-xs px-2 py-1 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:ring-1 focus:ring-blue-500';
 const SELECT = `${INPUT} cursor-pointer`;
+
+// ---- Built-in primitive options shown directly in the rule picker ----
+const PRIMITIVE_GROUPS: { label: string; options: { value: string; label: string }[] }[] = [
+  {
+    label: 'Whitespace',
+    options: [
+      { value: 'primitive:trim_all',      label: 'Trim all whitespace' },
+      { value: 'primitive:trim_leading',  label: 'Trim leading whitespace' },
+      { value: 'primitive:trim_trailing', label: 'Trim trailing whitespace' },
+    ],
+  },
+  {
+    label: 'Case',
+    options: [
+      { value: 'primitive:uppercase', label: 'Uppercase' },
+      { value: 'primitive:lowercase', label: 'Lowercase' },
+      { value: 'primitive:titlecase', label: 'Title case' },
+    ],
+  },
+  {
+    label: 'Numeric',
+    options: [
+      { value: 'primitive:round', label: 'Round (2 decimals)' },
+    ],
+  },
+  {
+    label: 'Context',
+    options: [
+      { value: 'primitive:read_column',    label: 'Read column (unbound — set below)' },
+      { value: 'primitive:read_row_index', label: 'Row index' },
+      { value: 'primitive:read_col_index', label: 'Column index' },
+    ],
+  },
+  {
+    label: 'Lookup',
+    options: [
+      { value: 'primitive:lookup_match',   label: 'Lookup match (configure in Rules Library)' },
+      { value: 'primitive:fetch_by_index', label: 'Fetch by index (configure in Rules Library)' },
+    ],
+  },
+];
+
+function makePrimitiveStep(stepType: string): RuleStep {
+  switch (stepType) {
+    case 'round':          return { type: 'round', decimals: 2 };
+    case 'read_column':    return { type: 'read_column', column: null };
+    case 'lookup_match':   return { type: 'lookup_match', lookupAlias: null, matchColumn: null, algorithm: 'fuzzy', threshold: 0.75, outputType: 'value', defaultValue: '' };
+    case 'fetch_by_index': return { type: 'fetch_by_index', lookupAlias: null, columnName: null, defaultValue: '#NO_MATCH' };
+    default:               return { type: stepType as SimpleStepType };
+  }
+}
+
+function syntheticRule(ruleId: string): UserRule {
+  const stepType = ruleId.slice('primitive:'.length);
+  return { id: ruleId, name: STEP_LABELS[stepType] ?? stepType, steps: [makePrimitiveStep(stepType)] };
+}
+
+// Resolve a ruleId to a UserRule — handles both library rules and primitive:* ids
+function resolveRule(ruleId: string, libraryRules: UserRule[]): UserRule | undefined {
+  if (ruleId.startsWith('primitive:')) return syntheticRule(ruleId);
+  return libraryRules.find(r => r.id === ruleId);
+}
+
+// Build effective rules array for execution: library rules + synthetic rules for any primitive assignments
+function effectiveRules(assignments: ColumnAssignment[], libraryRules: UserRule[]): UserRule[] {
+  const synthMap = new Map<string, UserRule>();
+  for (const a of assignments) {
+    if (a.ruleId.startsWith('primitive:') && !synthMap.has(a.ruleId)) {
+      synthMap.set(a.ruleId, syntheticRule(a.ruleId));
+    }
+  }
+  return [...libraryRules, ...synthMap.values()];
+}
 
 export function ColumnPopulator() {
   const { rules } = useRules();
@@ -97,8 +170,9 @@ export function ColumnPopulator() {
   function handleRunPreview() {
     if (!inputFile) return;
     const lMap = new Map(lookupFiles.map(lf => [lf.alias, lf.data]));
+    const allRules = effectiveRules(assignments, rules);
     try {
-      const rows = applyAssignments(inputFile, assignments, lMap, rules, 5);
+      const rows = applyAssignments(inputFile, assignments, lMap, allRules, 5);
       setPreview(rows);
       addToast('Preview ready', 'success');
     } catch (e) {
@@ -109,8 +183,9 @@ export function ColumnPopulator() {
   function handleDownload() {
     if (!inputFile) return;
     const lMap = new Map(lookupFiles.map(lf => [lf.alias, lf.data]));
+    const allRules = effectiveRules(assignments, rules);
     try {
-      const rows = applyAssignments(inputFile, assignments, lMap, rules);
+      const rows = applyAssignments(inputFile, assignments, lMap, allRules);
       const aoa: CellValue[][] = [inputFile.headers as CellValue[], ...rows];
       const ext = format === 'xlsx' ? '.xlsx' : '.csv';
       download(aoa, `${stemName(inputFile.file)}_populated${ext}`, format);
@@ -127,8 +202,7 @@ export function ColumnPopulator() {
       <div>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Column Populator</h1>
         <p className="text-sm text-slate-500 dark:text-slate-400">
-          Populate or transform columns using composable rules from the Rules Library.
-          {rules.length === 0 && <span className="text-amber-600 dark:text-amber-400 ml-1">Open the Rules Library (header) to create rules first.</span>}
+          Populate or transform columns using built-in primitives or composable rules from the Rules Library.
         </p>
       </div>
 
@@ -168,13 +242,10 @@ export function ColumnPopulator() {
 
       {/* Step 3 — Assign rules */}
       <StepCard step={3} title="Assign rules to columns" visible={!!inputFile}>
-        {rules.length === 0 ? (
-          <p className="text-sm text-slate-400">No rules in library. Open the Rules Library from the header to create rules.</p>
-        ) : (
-          <div className="space-y-2">
+        <div className="space-y-2">
             {inputFile?.headers.map(header => {
               const asn = getAssignment(header);
-              const rule = asn ? rules.find(r => r.id === asn.ruleId) : null;
+              const rule = asn ? resolveRule(asn.ruleId, rules) : null;
               const promoted = rule ? getPromotedArgs(rule, rules) : [];
               return (
                 <div key={header} className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3 space-y-2">
@@ -186,7 +257,16 @@ export function ColumnPopulator() {
                       className={`flex-1 ${SELECT} text-sm`}
                     >
                       <option value="">No rule (pass through)</option>
-                      {rules.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                      {PRIMITIVE_GROUPS.map(g => (
+                        <optgroup key={g.label} label={g.label}>
+                          {g.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                        </optgroup>
+                      ))}
+                      {rules.length > 0 && (
+                        <optgroup label="Rules Library">
+                          {rules.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                        </optgroup>
+                      )}
                     </select>
                   </div>
 
@@ -237,7 +317,6 @@ export function ColumnPopulator() {
               );
             })}
           </div>
-        )}
       </StepCard>
 
       {/* Step 4 — Preview */}
