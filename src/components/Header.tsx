@@ -6,11 +6,12 @@ interface Props {
   activeTool: Tool | null;
   onNavigateHome: () => void;
   onSelectTool: (id: string) => void;
+  onOpenRulesLibrary: () => void;
   theme: Theme;
   onToggleTheme: () => void;
 }
 
-export function Header({ activeTool, onNavigateHome, onSelectTool, theme, onToggleTheme }: Props) {
+export function Header({ activeTool, onNavigateHome, onSelectTool, onOpenRulesLibrary, theme, onToggleTheme }: Props) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [query, setQuery]             = useState('');
   const [cursor, setCursor]           = useState(0);
@@ -81,6 +82,14 @@ export function Header({ activeTool, onNavigateHome, onSelectTool, theme, onTogg
                 ))}
               </nav>
             )}
+
+            <button
+              onClick={onOpenRulesLibrary}
+              className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-lg transition-colors hidden sm:block"
+              title="Rules Library"
+            >
+              Rules
+            </button>
 
             <button
               onClick={() => setPaletteOpen(true)}

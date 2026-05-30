@@ -7,8 +7,9 @@ import { FileMerger }      from './FileMerger';
 import { CsvXlsxConverter } from './CsvXlsxConverter';
 import { FileComparator }  from './FileComparator';
 import { Deduplicator }    from './Deduplicator';
-import { EmptyRowRemover } from './EmptyRowRemover';
-import { FileSplitter }   from './FileSplitter';
+import { EmptyRowRemover }  from './EmptyRowRemover';
+import { FileSplitter }    from './FileSplitter';
+import { ColumnPopulator } from './ColumnPopulator';
 
 /* ── Icons ─────────────────────────────────────────────────────────────── */
 
@@ -105,6 +106,12 @@ const Icon = {
         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
     </svg>
   ),
+  Populate: ({ className }: { className?: string }) => (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+        d="M13 10V3L4 14h7v7l9-11h-7z" />
+    </svg>
+  ),
 };
 
 /* ── Tool registry ──────────────────────────────────────────────────────── */
@@ -175,6 +182,15 @@ export const TOOLS: Tool[] = [
     keywords: ['split', 'chunk', 'divide', 'partition', 'rows', 'zip'],
     icon: Icon.Split,
     component: FileSplitter,
+  },
+  {
+    id: 'column-populator',
+    name: 'Column Populator',
+    description: 'Populate or transform columns using composable, reusable rules with fuzzy lookup matching.',
+    category: 'Transform',
+    keywords: ['populate', 'fill', 'transform', 'lookup', 'fuzzy', 'rules', 'pipeline', 'classify'],
+    icon: Icon.Populate,
+    component: ColumnPopulator,
   },
 
   // Analysis
